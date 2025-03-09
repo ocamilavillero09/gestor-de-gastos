@@ -5,7 +5,6 @@ from datetime import datetime
 gestor_usuarios = GestorUsuarios()
 gestor_transacciones = GestorTransacciones()
 
-# Registro de usuario para poder probar el codigo
 gestor_usuarios.registrar_usuario(1, "admin", "1234", "admin@mail.com")
 
 while True:
@@ -13,11 +12,10 @@ while True:
     contraseña = input("Ingrese su contraseña: ")
 
     if gestor_usuarios.iniciar_sesion(nombre_usuario, contraseña):
-        print("\n Inicio de sesión exitoso.")
-        break  
+        print(" Inicio de sesión exitoso.")
+        break
     else:
-        print("Usuario o contraseña incorrectos. Intente nuevamente.\n")
-
+        print(" Usuario o contraseña incorrectos. Intente nuevamente.\n")
 
 while True:
     print("\n¿Qué tipo de transacción desea registrar?")
@@ -28,7 +26,7 @@ while True:
     opcion = input("Seleccione una opción (1/2/3): ")
 
     if opcion == "3":
-        print("\n Transacciones registradas")
+        print(" Transacciones registradas antes de salir:")
         transacciones = gestor_transacciones.obtener_transacciones_por_usuario(1)
         
         if not transacciones:
@@ -38,7 +36,7 @@ while True:
                 print(transaccion)
         
         print("\nSaliendo del sistema...")
-        break 
+        break  
 
     if opcion not in ["1", "2"]:
         print("Opción inválida. Intente nuevamente.")
@@ -46,25 +44,33 @@ while True:
 
     tipo_transaccion = "ingreso" if opcion == "1" else "gasto"
 
-    try:
-        monto = float(input(f"Ingrese el monto para el {tipo_transaccion}: "))
-        if monto <= 0:
-            print(" El monto debe ser mayor a 0.")
-            continue
+    while True:
+        try:
+            monto = float(input(f"Ingrese el monto para el {tipo_transaccion}: "))
+            
+            if monto <= 0:
+                print(" El monto debe ser mayor a 0.")
+                continue
 
-        fecha_actual = datetime.now()
-        categoria_id = 1  
+            if monto > 1_000_000:  
+                print(" El monto es demasiado grande. Ingrese un valor razonable.")
+                continue
+            
+            break  
 
-        gestor_transacciones.registrar_transaccion(
-            id_transaccion=len(gestor_transacciones.transacciones) + 1,
-            usuario_id=1,
-            categoria_id=categoria_id,
-            tipo=tipo_transaccion,
-            monto=monto,
-            fecha=fecha_actual
-        )
+        except ValueError:
+            print("Error: Debe ingresar un número válido.")
 
-        print("\n Transacción registrada con éxito!")
+    fecha_actual = datetime.now()
+    categoria_id = 1  
 
-    except ValueError:
-        print(" Error: Ingrese un número válido para el monto.")
+    gestor_transacciones.registrar_transaccion(
+        id_transaccion=len(gestor_transacciones.transacciones) + 1,
+        usuario_id=1,
+        categoria_id=categoria_id,
+        tipo=tipo_transaccion,
+        monto=monto,
+        fecha=fecha_actual
+    )
+
+    print("Transacción registrada con éxito!")
